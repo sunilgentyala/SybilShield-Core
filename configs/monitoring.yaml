@@ -1,0 +1,27 @@
+# SybilShield-Core monitoring configuration
+# Tune these values before deploying on a non-Bitcoin network.
+
+relay:
+  timeout_seconds: 30.0        # Block relay timeout before relay_timeout event fires
+  flood_rate_threshold: 50     # Max transactions per flood_window_seconds before mempool_flood
+  flood_window_seconds: 10.0   # Sliding window for flood rate measurement
+
+scoring:
+  decay_half_life_seconds: 86400.0   # 24 h -- score decays toward 0.5
+  quarantine_threshold: 0.20         # Peers below this score are quarantined
+  reinstatement_threshold: 0.35      # Score must exceed this to leave quarantine
+  alpha: 0.50   # Behavioral signal weight
+  beta: 0.30    # Graph-theoretic signal weight
+  gamma: 0.20   # Economic commitment signal weight
+
+isolation_guard:
+  max_connections_per_subnet16: 2
+  max_connections_per_subnet24: 1
+  min_subnet_diversity: 0.60
+
+graph:
+  snapshot_interval_blocks: 50   # Recompute topology metrics every N blocks
+  sybilrank_iterations: 20
+
+dfl_oracle:
+  deviation_threshold_sigma: 3.0   # L2 norm deviation before oracle_deviation event fires

@@ -1,0 +1,5 @@
+# Manuscript files -- do not commit before publication
+*.docx
+*.md
+*.pdf
+*.tex

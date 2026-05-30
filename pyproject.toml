@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sybilshield-core"
+version = "1.0.0"
+description = "Composite Trust Scoring framework for Sybil-resilient permissionless P2P networks"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+keywords = ["blockchain", "sybil", "p2p", "security", "consensus", "trust-scoring"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Security :: Cryptography",
+]
+dependencies = [
+    "networkx>=3.2",
+    "numpy>=1.26",
+    "pyyaml>=6.0",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.4",
+    "mypy>=1.10",
+]
+simulation = [
+    "matplotlib>=3.8",
+    "scipy>=1.12",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "simulation*", "analysis*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

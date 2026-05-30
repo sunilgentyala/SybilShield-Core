@@ -1,0 +1,14 @@
+.env
+.DS_Store
+__MACOSX/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+artifacts/logs/*.log
+*.pcap
