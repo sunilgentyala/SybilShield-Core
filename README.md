@@ -109,7 +109,7 @@ Suresh Kumar Darisi (Rocket Software Inc., Dallas TX)
 
 **Accepted at [IEEE ICICDS 2026](https://icicds.com/2026/)** (Paper ID ICICDS-690). The manuscript is not publicly available prior to publication to comply with IEEE copyright policy. A DOI and citation will be added here once the proceedings are indexed by IEEE Xplore.
 
-The [`paper/build_docx.py`](paper/build_docx.py) script used to generate the IEEE two-column DOCX is available for reproducibility purposes.
+
 
 ---
 
