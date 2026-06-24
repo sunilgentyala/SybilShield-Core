@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SybilShield-Core | Composite Trust Scoring for Sybil Attack Mitigation</title>
+<meta name="description" content="SybilShield-Core is an open-source, modular anti-Sybil framework for permissionless blockchain networks. Reference implementation for the IEEE ICICDS 2026 paper on Composite Trust Scoring.">
+<style>
+  :root {
+    --bg: #0b0f14;
+    --bg-alt: #11161d;
+    --card: #151b23;
+    --border: #232b35;
+    --text: #e6edf3;
+    --muted: #9aa7b4;
+    --accent: #4fd1c5;
+    --accent-2: #7c9eff;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+  header.hero {
+    padding: 90px 0 60px;
+    background: radial-gradient(circle at 20% 20%, rgba(79,209,197,0.12), transparent 45%),
+                radial-gradient(circle at 80% 0%, rgba(124,158,255,0.12), transparent 40%);
+    border-bottom: 1px solid var(--border);
+  }
+  .eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(79,209,197,0.4);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: 2.6rem;
+    margin: 0 0 14px;
+    line-height: 1.15;
+  }
+  h1 span { color: var(--accent); }
+  .lede {
+    font-size: 1.15rem;
+    color: var(--muted);
+    max-width: 720px;
+    margin: 0 0 30px;
+  }
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .btn-primary { background: var(--accent); color: #07211f; }
+  .btn-primary:hover { background: #6fe0d5; text-decoration: none; }
+  .btn-secondary { border: 1px solid var(--border); color: var(--text); }
+  .btn-secondary:hover { border-color: var(--accent); text-decoration: none; }
+
+  section { padding: 56px 0; border-bottom: 1px solid var(--border); }
+  section:last-of-type { border-bottom: none; }
+  h2 {
+    font-size: 1.6rem;
+    margin: 0 0 10px;
+  }
+  .section-sub { color: var(--muted); margin: 0 0 30px; max-width: 700px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 700px) { .grid, .grid-3 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+  }
+  .card h3 {
+    margin: 0 0 8px;
+    font-size: 1.02rem;
+    color: var(--text);
+  }
+  .card p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+  .stat { text-align: center; }
+  .stat .num { font-size: 2.1rem; font-weight: 700; color: var(--accent); }
+  .stat .label { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
+
+  .why-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .why-list li {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 18px;
+    color: var(--muted);
+  }
+  .why-list li strong { color: var(--text); }
+
+  pre {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    overflow-x: auto;
+    font-size: 0.82rem;
+    color: #c8d3dd;
+  }
+  code {
+    background: rgba(124,158,255,0.12);
+    color: var(--accent-2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.88em;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  th { color: var(--accent); font-weight: 600; }
+  td { color: var(--muted); }
+  td:first-child, th:first-child { color: var(--text); }
+
+  .cite {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  footer {
+    padding: 40px 0 60px;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  footer a { color: var(--muted); }
+  footer a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Accepted &middot; IEEE ICICDS 2026 &middot; Paper ID ICICDS-690</span>
+    <h1>Stopping Sybil attacks <span>without identity friction</span></h1>
+    <p class="lede">
+      SybilShield-Core is an open-source, modular framework that detects and isolates
+      Sybil identities in permissionless peer-to-peer blockchain networks. A Composite
+      Trust Score fuses behavioral telemetry, peer-graph topology, and economic
+      commitment, no Proof-of-Work tax, no centralized identity authority, just
+      observable evidence governing each peer's influence on consensus.
+    </p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="https://github.com/sunilgentyala/SybilShield-Core">View on GitHub</a>
+      <a class="btn btn-secondary" href="https://icicds.com/2026/">IEEE ICICDS 2026</a>
+    </div>
+  </div>
+</header>
+
+<section id="results">
+  <div class="wrap">
+    <div class="grid-3">
+      <div class="card stat">
+        <div class="num">94%+</div>
+        <div class="label">steady-state detection rate up to 40% adversary density</div>
+      </div>
+      <div class="card stat">
+        <div class="num">&lt;2.1%</div>
+        <div class="label">false-positive rate on honest peers</div>
+      </div>
+      <div class="card stat">
+        <div class="num">&le;4.1%</div>
+        <div class="label">consensus latency overhead at 2,000 nodes</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="wrap">
+    <h2>Why this matters</h2>
+    <p class="section-sub">
+      Sybil resistance is not a niche blockchain concern, it is the structural assumption
+      that "one peer, one vote" depends on. The same identity-spoofing pattern underwrites
+      attacks on decentralized federated learning, oracle price feeds, and any system that
+      trusts the apparent diversity of its participants. A framework that closes this gap
+      without reintroducing a central authority strengthens the integrity of decentralized
+      infrastructure that increasingly underpins finance, identity, and shared AI training.
+    </p>
+    <ul class="why-list">
+      <li><strong>Closes a gap neither existing defense solves.</strong> Proof-of-Work prices out small adversaries but not well-funded ones; trusted identity authorities reintroduce the single point of failure permissionless systems exist to avoid. The Composite Trust Score (CTS) detects Sybil behavior from observable evidence instead.</li>
+      <li><strong>Outperforms single-signal detection.</strong> Fusing behavioral, graph-theoretic, and economic signals lifts detection 8.4-21.7 percentage points above SybilGuard, SybilLimit, and stake-weighted baselines at adversary fractions above 30%, evaluated on the same synthetic networks.</li>
+      <li><strong>Protects shared machine learning, not just consensus.</strong> Projected into a federated learning aggregation layer, the CTS cuts poisoned-model backdoor accuracy from 84.7% to 11.3% at a 30% Sybil fraction, directly relevant to any organization running federated or oracle-fed ML on shared infrastructure.</li>
+      <li><strong>Mitigation is reversible by design.</strong> Responses escalate gradually (monitor &rarr; throttle &rarr; quarantine) and recover as evidence changes, removing the permanent-ban incentive that lets attackers weaponize false reports against honest peers.</li>
+      <li><strong>Decentralization-preserving.</strong> No external authority is consulted and no computationally wasteful puzzle is required; the score recalculates continuously from each peer's own behavior.</li>
+      <li><strong>Open and reproducible.</strong> MIT-licensed reference implementation, simulation harness, and unit tests are public, so detection-rate and overhead claims can be independently verified.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <p class="section-sub">Three independently maintained sub-scores combine into one Composite Trust Score (CTS) per peer, which then governs quorum weight, connection acceptance, and (optionally) federated learning aggregation weight.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>Behavioral score</h3>
+        <p>Continuously updated from block relay timing, mempool propagation, and voting deviations. Decays toward neutral with a 24-hour half-life, so static whitelisting is impossible: inactive peers must keep demonstrating good behavior.</p>
+      </div>
+      <div class="card">
+        <h3>Graph score</h3>
+        <p>Derived from local clustering coefficient, SybilRank propagation from high-stake seed nodes, and subnet diversity. Penalizes the tight-cluster topology characteristic of Sybil subgraphs without requiring a certified honest seed set.</p>
+      </div>
+      <div class="card">
+        <h3>Economic score</h3>
+        <p>Captures stake age and capital lockup. Used as a contributing signal rather than the primary defense, since well-capitalized adversaries can offset pure economic penalties through identity rotation.</p>
+      </div>
+      <div class="card">
+        <h3>Mitigation pipeline</h3>
+        <p>A sigmoid mapping turns the composite score into quorum weight. Four response tiers, monitoring, throttling, peer-list removal, and full quarantine, apply escalating but reversible pressure as the score drops.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="threats">
+  <div class="wrap">
+    <h2>Attack coverage</h2>
+    <p class="section-sub">Evaluated across four adversarial scenarios on synthetic P2P networks of 50 to 2,000 nodes, with adversary fractions from 10% to 45%.</p>
+    <table>
+      <thead><tr><th>Attack class</th><th>SybilShield-Core defense</th></tr></thead>
+      <tbody>
+        <tr><td>Consensus masking</td><td>Behavioral + graph score drift triggers quorum weight reduction before false views can dominate a target's local chain</td></tr>
+        <tr><td>Eclipse partitioning</td><td>IsolationGuard subnet-diversity and per-subnet connection limits reject monopolizing connection attempts independent of the CTS</td></tr>
+        <tr><td>DFL gradient poisoning</td><td>CTS-weighted FedAvg attenuates the aggregation weight of peers whose gradients deviate statistically from honest submissions</td></tr>
+        <tr><td>Mempool / bandwidth exhaustion</td><td>Behavioral score penalizes flooding and GETDATA cycling, escalating to connection throttling and quarantine</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <h2>Quick start</h2>
+    <p class="section-sub">Python 3.10+ is the only prerequisite.</p>
+    <pre><code>git clone https://github.com/sunilgentyala/SybilShield-Core.git
+cd SybilShield-Core
+pip install -e ".[dev]"
+
+# Run a Sybil simulation (50-node network, 30% adversary ratio)
+python scripts/run_simulation.py --nodes 50 --sybil-ratio 0.30 --scenario eclipse
+
+# Run unit tests
+pytest tests/unit/ -v</code></pre>
+  </div>
+</section>
+
+<section id="cite">
+  <div class="wrap">
+    <h2>Citation</h2>
+    <div class="cite">
+      Gentyala, S., Sanjeevaiah, K., &amp; Darisi, S. K. (2026). <em>SybilShield-Core: A Composite Trust Scoring Framework for Sybil Attack Mitigation in Permissionless Blockchain Networks.</em> Accepted, IEEE ICICDS 2026 (Paper ID ICICDS-690).
+      <br>
+      <a href="https://icicds.com/2026/">icicds.com/2026</a>
+      <br><br>
+      Reference implementation: <a href="https://github.com/sunilgentyala/SybilShield-Core">github.com/sunilgentyala/SybilShield-Core</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    SybilShield-Core &middot; MIT License &middot; Sunil Gentyala, HCLTECH (HCL America Inc.) &middot;
+    <a href="https://github.com/sunilgentyala/SybilShield-Core">GitHub</a>
+  </div>
+</footer>
+
+</body>
+</html>
