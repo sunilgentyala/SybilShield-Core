@@ -15,10 +15,10 @@ Project site: **[sunilgentyala.github.io/SybilShield-Core](https://sunilgentyala
 Sybil attacks are the structural weak point of every permissionless network: an adversary who can mint pseudonymous identities for near-zero cost can distort consensus, partition honest peers, and poison decentralized data pipelines, without ever breaking a single cryptographic primitive. That makes Sybil resistance a societal cybersecurity problem, not just a blockchain one, since the same identity-spoofing pattern underwrites attacks on federated learning, oracle feeds, and any decentralized system that assumes "one peer, one vote."
 
 - **Closes a gap neither Proof-of-Work nor identity authorities solve.** PoW prices out small adversaries but not well-resourced ones; centralized identity checks reintroduce the single point of failure permissionless systems exist to avoid. The Composite Trust Score (CTS) detects Sybil behavior from observable evidence instead, with no protocol-level identity friction and no trusted third party.
-- **Detects what single-signal defenses miss.** Fusing behavioral telemetry, peer-graph topology, and economic commitment lifts detection above 94% at up to 40% adversary density while holding false positives below 2.1%, materially better than graph-only (SybilGuard/SybilLimit) or stake-only baselines evaluated in the same simulations.
-- **Protects the systems people already depend on.** The same CTS signal extends into decentralized federated learning aggregation, cutting poisoned-model backdoor accuracy from 84.7% to 11.3% at a 30% adversary fraction, directly relevant to any organization running federated or oracle-fed ML on shared infrastructure.
-- **Reversible by design.** Mitigation is tiered (monitoring to quorum-weight reduction to quarantine) and recoverable as evidence changes, avoiding the permanent-ban incentive that lets attackers weaponize false reports against honest peers.
-- **Open and reproducible.** MIT-licensed reference implementation, simulation harness, and unit tests are public, so the detection-rate and overhead claims can be independently verified rather than taken on faith.
+- **Beats a graph-only baseline, measured.** On a real, runnable simulation (`scripts/run_simulation.py`, n=300 honest nodes, 20 trials/config), the composite CTS pipeline reaches 100% TPR / 0.00% FPR against an actively attacking Sybil population across 10-30% adversary density, versus 65.9-100% TPR / 0.0-11.0% FPR for a simplified graph-propagation-only baseline on the identical topology. See [`simulation/results/sybil_detection_results.txt`](simulation/results/sybil_detection_results.txt) for the full numbers, methodology, and honest limitations (including why a half-dormant Sybil population is detected at only ~48-51%).
+- **FL poisoning defense is wired but not yet benchmarked.** The `oracle_deviation` penalty event exists and is exercised by the same simulation, but no FL aggregation module or model-accuracy/backdoor-resistance benchmark exists in this repo yet. An earlier claim of cutting poisoned-model backdoor accuracy from 84.7% to 11.3% was not backed by any runnable code and has been removed rather than replaced with another unverified number.
+- **Mitigation is tiered; automatic reversal is a known gap.** Mitigation escalates (monitoring to quorum-weight reduction to quarantine), but as measured in this benchmark, the reference `CTSEngine`'s quarantine flag is currently a one-way latch — it does not automatically reinstate a peer even after the score recovers above the reinstatement threshold in `configs/monitoring.yaml`. This is disclosed, not fixed silently.
+- **Open and reproducible.** MIT-licensed reference implementation, a real simulation harness, and unit tests are public, so the detection-rate and overhead numbers above can be independently re-run and verified rather than taken on faith.
 
 ---
 
@@ -46,40 +46,38 @@ The core mitigation engine follows a Pipes-and-Filters pattern over an internal 
 SybilShield-Core/
 ├── src/
 │   ├── core/
-│   │   ├── identity/         # Peer identity management, key binding, commitment schemes
-│   │   ├── scoring/          # Composite Trust Score engine, decay functions
-│   │   └── consensus/        # Consensus weight assignment, quorum arbitration
+│   │   ├── identity/         # (stub) Peer identity management, key binding, commitment schemes
+│   │   ├── scoring/          # Composite Trust Score engine, decay functions -- IMPLEMENTED
+│   │   └── consensus/        # (stub) Consensus weight assignment, quorum arbitration
 │   ├── monitoring/
-│   │   ├── behavior/         # Block relay timing, mempool flood detection
-│   │   ├── graph/            # Peer topology snapshots, clustering coefficient probes
-│   │   └── telemetry/        # Metrics collection, event bus publisher
+│   │   ├── behavior/         # Block relay timing, mempool flood detection -- IMPLEMENTED
+│   │   ├── graph/            # Peer topology snapshots, clustering/SybilRank probes -- IMPLEMENTED
+│   │   └── telemetry/        # (stub) Metrics collection, event bus publisher
 │   └── mitigation/
-│       ├── quorum/           # Dynamic quorum weight reduction for flagged nodes
-│       ├── penalty/          # Stake slashing and connection throttling
-│       └── isolation/        # Eclipse prevention, peer list sanitization
+│       ├── quorum/           # (stub) Dynamic quorum weight reduction for flagged nodes
+│       ├── penalty/          # (stub) Stake slashing and connection throttling
+│       └── isolation/        # Eclipse prevention, peer list sanitization -- IMPLEMENTED
 ├── simulation/
-│   ├── network/              # Synthetic P2P network topology generators
-│   ├── adversary/            # Sybil attack scenario implementations
-│   └── scenarios/            # Parameterized test scenarios (scale, intensity)
-├── analysis/
-│   ├── graph_engine/         # NetworkX / igraph wrappers, SybilRank integration
-│   ├── ml_classifier/        # Behavioral anomaly classifier (GNN / isolation forest)
-│   └── oracle/               # Oracle feed integrity monitoring
+│   ├── network/              # Synthetic P2P topology generation (Barabasi-Albert, networkx)
+│   ├── adversary/            # Sybil attack event generator (single-shot, no network model)
+│   ├── scenarios/            # Sybil injection + the real detection pipeline that wires
+│   │                         #   src/core, src/monitoring, src/mitigation together
+│   └── results/              # Measured output of scripts/run_simulation.py
 ├── tests/
 │   ├── unit/                 # Component-level tests
-│   ├── integration/          # Cross-layer pipeline tests
-│   └── simulation/           # Full-network adversarial simulation harness
-├── docs/
-│   ├── threat_model/         # Formal threat model (STRIDE + DREAD scoring)
-│   ├── architecture/         # Architecture decision records
-│   └── api/                  # Module API reference
-├── configs/                  # Default and environment-specific configuration YAML
-├── scripts/                  # Simulation runners, data export, graph visualization
-└── artifacts/
-    ├── benchmarks/           # Latency, throughput, detection rate results
-    ├── figures/              # Generated plots and topology diagrams
-    └── logs/                 # Simulation run logs
+│   ├── integration/          # (empty -- no cross-layer pipeline tests yet)
+│   └── simulation/           # Smoke tests for the detection pipeline
+├── configs/                  # Default monitoring/scoring configuration YAML
+├── scripts/
+│   ├── run_simulation.py     # Real detection-pipeline simulation runner (see Quick Start)
+│   └── generate_ieee_docx.py # IEEE DOCX generator (delegates to paper/build_docx.py)
+└── paper/                    # DOCX build script for the IEEE manuscript (not the manuscript itself)
 ```
+
+Directories marked `(stub)` above contain only an `__init__.py` -- no functional code exists there
+yet. `analysis/` and `artifacts/` directories referenced in earlier versions of this README did not
+exist in the repository and have been removed from this listing rather than left as aspirational
+structure.
 
 ---
 
@@ -90,12 +88,59 @@ git clone https://github.com/sunilgentyala/SybilShield-Core.git
 cd SybilShield-Core
 pip install -e ".[dev]"
 
-# Run a Sybil simulation (50-node network, 30% adversary ratio)
-python scripts/run_simulation.py --nodes 50 --sybil-ratio 0.30 --scenario eclipse
+# Run the real Sybil-detection simulation (wires src/core/scoring/cts_engine.py,
+# src/mitigation/isolation/isolation_guard.py, src/monitoring/behavior/relay_monitor.py,
+# and src/monitoring/graph/peer_graph.py together against a generated network).
+# Small/fast smoke run:
+python scripts/run_simulation.py --nodes 60 --trials 3 --scenario eclipse --sybil-ratios 0.20
 
-# Run unit tests
-pytest tests/unit/ -v
+# Full benchmark scale used to produce simulation/results/sybil_detection_results.txt
+# (~10-13 minutes on a modern laptop):
+python scripts/run_simulation.py --nodes 300 --trials 20 \
+    --sybil-ratios 0.10,0.20,0.30 --scenario all --intensities 1.0,0.5
+
+# Run unit + simulation tests
+pytest tests/unit/ tests/simulation/ -v
 ```
+
+Full measured results, methodology, tool versions, and honest scope limitations are in
+[`simulation/results/sybil_detection_results.txt`](simulation/results/sybil_detection_results.txt).
+
+---
+
+## Measured Results
+
+The numbers below are from `scripts/run_simulation.py` actually run against this repo's own
+`CTSEngine`, `BehaviorMonitor`, `PeerGraph`, and `IsolationGuard` classes -- not placeholder or
+projected figures. Scale: n=300 honest nodes (Barabasi-Albert topology), 20 trials per
+configuration, 25 simulated behavioral rounds per trial, 3 Sybil densities (10/20/30% of the
+total network) x 2 adversary-activity levels x 4 attack scenarios = 480 trials total
+(~620s wall-clock on this session's WSL2/x86-64 environment).
+
+| Metric | Composite CTS (this repo) | Graph-only baseline |
+|---|---|---|
+| TPR, active adversary, all densities | **100.0%** | 65.9-100.0% (density-dependent) |
+| FPR, active adversary, all densities | **0.00%** | 0.0-11.0% (density-dependent) |
+| TPR, half-dormant Sybil population | ~48-51% | 65.9-100.0% |
+| Median detection latency (rounds) | 0-6 (attack-type dependent) | n/a |
+| IsolationGuard eclipse-edge rejection | 27.5% (110/400) | n/a |
+| Per-connection compute overhead | 76.14 &micro;s (vs. 0.068 &micro;s no-op) | n/a |
+
+**This is smaller in scale than the 2,000-node / 10,000-block figures asserted in earlier
+versions of this README and site**, which predated any runnable simulation. See
+[`simulation/results/sybil_detection_results.txt`](simulation/results/sybil_detection_results.txt)
+for the full per-scenario breakdown and, importantly, the honest limitations section covering:
+why the graph-only baseline's numbers move mechanically with density (a fixed 20th-percentile
+flagging quota, not a deeper property of graph-based detection), why a dormant Sybil population
+is barely more detectable than chance (the graph signal alone contributes at most &plusmn;10% to
+a peer's score), and a discovered gap where `CTSEngine`'s quarantine flag never automatically
+resets even though the paper describes mitigation as reversible.
+
+No federated-learning poisoning-defense benchmark (model accuracy / backdoor resistance) exists
+in this repo. The `oracle_deviation` penalty event is exercised by the simulation, but there is
+no FL aggregation module to benchmark against real model accuracy figures. An earlier "84.7% to
+11.3% backdoor accuracy" claim was not backed by any runnable code and has been removed rather
+than replaced with an equally unverified number.
 
 ---
 

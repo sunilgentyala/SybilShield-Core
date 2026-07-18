@@ -160,6 +160,19 @@
     color: var(--muted);
   }
 
+  .disclosure {
+    font-size: 0.85rem;
+    color: var(--muted);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+  }
+  .table-wrap { overflow-x: auto; }
+  .status-ok { color: var(--accent-2); }
+  .status-pending { color: var(--muted); }
+
   footer {
     padding: 40px 0 60px;
     color: var(--muted);
@@ -182,6 +195,11 @@
       commitment, no Proof-of-Work tax, no centralized identity authority, just
       observable evidence governing each peer's influence on consensus.
     </p>
+    <p class="lede" style="font-size: 0.95rem;">
+      The numbers below are from a real, runnable simulation harness added to this repo
+      (<code>scripts/run_simulation.py</code>) &mdash; not the earlier placeholder claims.
+      See the disclosure in <a href="#benchmarks">Benchmark results</a> for exact scale and caveats.
+    </p>
     <div class="btn-row">
       <a class="btn btn-primary" href="https://github.com/sunilgentyala/SybilShield-Core">View on GitHub</a>
       <a class="btn btn-secondary" href="https://icicds.com/2026/">IEEE ICICDS 2026</a>
@@ -193,16 +211,16 @@
   <div class="wrap">
     <div class="grid-3">
       <div class="card stat">
-        <div class="num">94%+</div>
-        <div class="label">steady-state detection rate up to 40% adversary density</div>
+        <div class="num">100% / ~50%</div>
+        <div class="label">measured detection rate: fully active vs. half-dormant Sybil population (n=300 nodes, 20 trials/config)</div>
       </div>
       <div class="card stat">
-        <div class="num">&lt;2.1%</div>
-        <div class="label">false-positive rate on honest peers</div>
+        <div class="num">0.00%</div>
+        <div class="label">measured false-positive rate on honest peers, all 480 trials</div>
       </div>
       <div class="card stat">
-        <div class="num">&le;4.1%</div>
-        <div class="label">consensus latency overhead at 2,000 nodes</div>
+        <div class="num">76&nbsp;&micro;s</div>
+        <div class="label">IsolationGuard per-connection compute overhead (not network latency &mdash; see disclosure)</div>
       </div>
     </div>
   </div>
@@ -221,11 +239,11 @@
     </p>
     <ul class="why-list">
       <li><strong>Closes a gap neither existing defense solves.</strong> Proof-of-Work prices out small adversaries but not well-funded ones; trusted identity authorities reintroduce the single point of failure permissionless systems exist to avoid. The Composite Trust Score (CTS) detects Sybil behavior from observable evidence instead.</li>
-      <li><strong>Outperforms single-signal detection.</strong> Fusing behavioral, graph-theoretic, and economic signals lifts detection 8.4-21.7 percentage points above SybilGuard, SybilLimit, and stake-weighted baselines at adversary fractions above 30%, evaluated on the same synthetic networks.</li>
-      <li><strong>Protects shared machine learning, not just consensus.</strong> Projected into a federated learning aggregation layer, the CTS cuts poisoned-model backdoor accuracy from 84.7% to 11.3% at a 30% Sybil fraction, directly relevant to any organization running federated or oracle-fed ML on shared infrastructure.</li>
-      <li><strong>Mitigation is reversible by design.</strong> Responses escalate gradually (monitor &rarr; throttle &rarr; quarantine) and recover as evidence changes, removing the permanent-ban incentive that lets attackers weaponize false reports against honest peers.</li>
+      <li><strong>Beats a graph-only baseline in the same harness.</strong> On identical generated networks, a simplified graph-propagation-only detector (SybilRank-style, fixed 20th-percentile cutoff) reached 65.9-100% TPR with 0-11% FPR depending on Sybil density; the composite CTS pipeline reached 100% TPR / 0.00% FPR against an actively attacking Sybil population across the same densities. See <a href="#benchmarks">Benchmark results</a> for the full comparison, including why the baseline's numbers move mechanically with density.</li>
+      <li><strong>Federated-learning poisoning defense is architecturally wired but not yet benchmarked.</strong> The oracle_deviation event path exists and is exercised by this repo's simulation (a Sybil emitting anomalous updates is detected via the same CTS quarantine mechanism), but no actual model-accuracy / backdoor-resistance number has been measured. An earlier "84.7% &rarr; 11.3%" backdoor-accuracy claim was not backed by any runnable benchmark and has been removed rather than replaced with an equally unverified number.</li>
+      <li><strong>Mitigation is tiered but not yet auto-reversible in the reference code.</strong> The design calls for escalating, recoverable responses (monitor &rarr; throttle &rarr; quarantine &rarr; reinstate). As measured in this benchmark, the reference <code>CTSEngine</code>'s quarantine flag is currently a one-way latch: once a peer's score crosses the 0.20 threshold it stays quarantined even if the score later recovers. Automatic reinstatement is a known gap, not yet implemented.</li>
       <li><strong>Decentralization-preserving.</strong> No external authority is consulted and no computationally wasteful puzzle is required; the score recalculates continuously from each peer's own behavior.</li>
-      <li><strong>Open and reproducible.</strong> MIT-licensed reference implementation, simulation harness, and unit tests are public, so detection-rate and overhead claims can be independently verified.</li>
+      <li><strong>Open and reproducible.</strong> MIT-licensed reference implementation, a real simulation harness (<code>scripts/run_simulation.py</code>), and unit tests are public, so detection-rate and overhead claims can be independently re-run and verified.</li>
     </ul>
   </div>
 </section>
@@ -233,7 +251,7 @@
 <section id="architecture">
   <div class="wrap">
     <h2>How it works</h2>
-    <p class="section-sub">Three independently maintained sub-scores combine into one Composite Trust Score (CTS) per peer, which then governs quorum weight, connection acceptance, and (optionally) federated learning aggregation weight.</p>
+    <p class="section-sub">Three independently maintained sub-scores combine into one Composite Trust Score (CTS) per peer, which then governs quorum weight and connection acceptance. A federated-learning aggregation weighting layer is part of the paper's design and has a wired event type (<code>oracle_deviation</code>), but is not yet implemented as a standalone module in this repo.</p>
     <div class="grid">
       <div class="card">
         <h3>Behavioral score</h3>
@@ -241,15 +259,15 @@
       </div>
       <div class="card">
         <h3>Graph score</h3>
-        <p>Derived from local clustering coefficient, SybilRank propagation from high-stake seed nodes, and subnet diversity. Penalizes the tight-cluster topology characteristic of Sybil subgraphs without requiring a certified honest seed set.</p>
+        <p>Derived from local clustering coefficient, SybilRank propagation from high-stake seed nodes, and subnet diversity. Penalizes the tight-cluster topology characteristic of Sybil subgraphs without requiring a certified honest seed set. Measured in this repo's harness to contribute at most &plusmn;10% of a peer's score &mdash; on its own it is not strong enough to quarantine a behaviorally-dormant Sybil.</p>
       </div>
       <div class="card">
         <h3>Economic score</h3>
-        <p>Captures stake age and capital lockup. Used as a contributing signal rather than the primary defense, since well-capitalized adversaries can offset pure economic penalties through identity rotation.</p>
+        <p>Stake age is recorded per peer, but as measured in this benchmark <code>CTSEngine</code>'s own scoring path does not currently read it automatically; the only economic lever exercised is the existing <code>stake_age_bonus</code> reward event, applied explicitly by the simulation harness rather than derived internally from stake age.</p>
       </div>
       <div class="card">
         <h3>Mitigation pipeline</h3>
-        <p>A sigmoid mapping turns the composite score into quorum weight. Four response tiers, monitoring, throttling, peer-list removal, and full quarantine, apply escalating but reversible pressure as the score drops.</p>
+        <p>A sigmoid mapping turns the composite score into quorum weight. Four response tiers, monitoring, throttling, peer-list removal, and full quarantine, apply escalating pressure as the score drops. As measured, quarantine in the reference engine is currently one-way (no automatic reinstatement even if the score later recovers) &mdash; see the disclosure in Benchmark results.</p>
       </div>
     </div>
   </div>
@@ -258,16 +276,47 @@
 <section id="threats">
   <div class="wrap">
     <h2>Attack coverage</h2>
-    <p class="section-sub">Evaluated across four adversarial scenarios on synthetic P2P networks of 50 to 2,000 nodes, with adversary fractions from 10% to 45%.</p>
+    <p class="section-sub">Evaluated by actually driving the four scripted attack scenarios below through the real detection pipeline (n=300 honest nodes, 20 trials per density, 10/20/30% Sybil density &mdash; see <a href="#benchmarks">Benchmark results</a>). This is a smaller scale than the 50-2,000 node / 10-45% range originally asserted here; that claim was never backed by a runnable simulation.</p>
+    <div class="table-wrap">
     <table>
-      <thead><tr><th>Attack class</th><th>SybilShield-Core defense</th></tr></thead>
+      <thead><tr><th>Attack class</th><th>SybilShield-Core defense</th><th>Measured (active adversary)</th></tr></thead>
       <tbody>
-        <tr><td>Consensus masking</td><td>Behavioral + graph score drift triggers quorum weight reduction before false views can dominate a target's local chain</td></tr>
-        <tr><td>Eclipse partitioning</td><td>IsolationGuard subnet-diversity and per-subnet connection limits reject monopolizing connection attempts independent of the CTS</td></tr>
-        <tr><td>DFL gradient poisoning</td><td>CTS-weighted FedAvg attenuates the aggregation weight of peers whose gradients deviate statistically from honest submissions</td></tr>
-        <tr><td>Mempool / bandwidth exhaustion</td><td>Behavioral score penalizes flooding and GETDATA cycling, escalating to connection throttling and quarantine</td></tr>
+        <tr><td>Consensus masking</td><td>Repeated relay-timeout penalties (0.05/event) via the real <code>BehaviorMonitor.record_relay()</code> threshold check drive quorum weight down</td><td class="status-ok">100% TPR, 0% FPR; median 6 rounds to quarantine</td></tr>
+        <tr><td>Eclipse partitioning</td><td>IsolationGuard subnet-diversity and per-subnet connection limits reject monopolizing connection attempts independent of the CTS</td><td class="status-ok">27.5% of Sybil attack-edge connection attempts rejected outright (110/400); behavioral quarantine at median round 0</td></tr>
+        <tr><td>DFL gradient poisoning</td><td>An anomalous update fires the <code>oracle_deviation</code> penalty event, which this benchmark drives directly through <code>CTSEngine</code></td><td>100% TPR, 0% FPR on the <em>event-detection</em> path only &mdash; no FL aggregation module or model-accuracy benchmark exists in this repo (see disclosure)</td></tr>
+        <tr><td>Mempool / bandwidth exhaustion</td><td>Sliding-window flood detection in the real <code>BehaviorMonitor.record_transaction_broadcast()</code> (&gt;50 tx / 10s) triggers penalties</td><td class="status-ok">100% TPR, 0% FPR; median &lt;1 round (burst typically fires the threshold multiple times in round 0)</td></tr>
       </tbody>
     </table>
+    </div>
+    <p class="section-sub" style="margin-top: 16px;">All "measured" figures above are for the <strong style="color: var(--text);">fully active</strong> adversary condition (intensity=1.0). With half the Sybil population behaviorally dormant (intensity=0.5), detection drops to ~48-51% across all four scenarios &mdash; see Benchmark results.</p>
+  </div>
+</section>
+
+<section id="benchmarks">
+  <div class="wrap">
+    <h2>Benchmark results</h2>
+    <div class="disclosure">
+      <strong>Disclosure:</strong> Scale is n&nbsp;=&nbsp;300 honest nodes (Barabasi&ndash;Albert topology), 20 trials per configuration, 25 simulated behavioral rounds per trial, 3 Sybil densities (10/20/30% of the total network) &times; 2 adversary-activity levels (fully active, half-dormant) &times; 4 attack scenarios = 480 trials total. This is smaller than the 2,000-node / 10,000-block scale originally asserted on this site and in the paper's Evaluation section; that claim predated any runnable simulation. "Rounds" are abstract behavioral ticks, not real block intervals &mdash; no consensus, mempool, or network I/O is actually simulated. Full methodology, per-scenario tables, and known limitations are in <a href="https://github.com/sunilgentyala/SybilShield-Core/blob/main/simulation/results/sybil_detection_results.txt">simulation/results/sybil_detection_results.txt</a>; reproduce with <code>python scripts/run_simulation.py</code>.
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Metric</th><th>Composite CTS (this repo)</th><th>Graph-only baseline</th></tr></thead>
+        <tbody>
+          <tr><td>TPR, active adversary, all densities</td><td class="status-ok">100.0%</td><td>65.9&ndash;100.0% (density-dependent, see note)</td></tr>
+          <tr><td>FPR, active adversary, all densities</td><td class="status-ok">0.00%</td><td>0.0&ndash;11.0% (density-dependent, see note)</td></tr>
+          <tr><td>TPR, half-dormant Sybil population</td><td>~48&ndash;51%</td><td>65.9&ndash;100.0%</td></tr>
+          <tr><td>Median detection latency (rounds)</td><td>0&ndash;6 (attack-type dependent)</td><td>n/a (single snapshot, no latency concept)</td></tr>
+          <tr><td>IsolationGuard eclipse-edge rejection</td><td class="status-ok">27.5% (110/400)</td><td>n/a</td></tr>
+          <tr><td>Per-connection compute overhead</td><td>76.14 &micro;s (vs. 0.068 &micro;s no-op)</td><td>n/a</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="section-sub" style="margin-top: 20px;">
+      The graph-only baseline is a simplified SybilRank-style detector (flags the bottom 20th percentile of nodes by propagated trust) run on the identical generated topology &mdash; not a reimplementation of SybilGuard or SybilLimit's random-walk protocol. Its TPR/FPR move mechanically with density because its flagging quota is fixed at 20% of all nodes: at 10% Sybil density it over-flags honest peers to fill the quota (11.0% FPR); at 30% density it structurally cannot flag more than 20/30 &asymp; 66.7% of the true Sybils. This is a property of the fixed-quota baseline, not evidence that graph-only detection "gets harder" at scale in some deeper sense.
+    </p>
+    <p class="section-sub">
+      The half-dormant condition exists because <code>CTSEngine.update_centrality()</code> contributes at most &plusmn;10% to a peer's score (a constant in <code>cts_engine.py</code>) &mdash; on its own that is not enough to push a Sybil that never behaves maliciously from the neutral starting score (0.5) down to the 0.20 quarantine threshold. A dormant Sybil is, on this evidence, detected only if it also happens to trip a behavioral penalty.
+    </p>
   </div>
 </section>
 
@@ -279,11 +328,13 @@
 cd SybilShield-Core
 pip install -e ".[dev]"
 
-# Run a Sybil simulation (50-node network, 30% adversary ratio)
-python scripts/run_simulation.py --nodes 50 --sybil-ratio 0.30 --scenario eclipse
+# Run the real detection-pipeline simulation (writes a full report to
+# simulation/results/sybil_detection_results.txt)
+python scripts/run_simulation.py --nodes 300 --trials 20 \
+    --sybil-ratios 0.10,0.20,0.30 --scenario all --intensities 1.0,0.5
 
-# Run unit tests
-pytest tests/unit/ -v</code></pre>
+# Run unit + simulation tests
+pytest tests/unit/ tests/simulation/ -v</code></pre>
   </div>
 </section>
 

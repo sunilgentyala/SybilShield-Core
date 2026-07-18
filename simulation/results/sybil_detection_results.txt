@@ -1,0 +1,228 @@
+SybilShield-Core Benchmark: Real Sybil Detection Pipeline
+======================================================================
+Date        : 2026-07-17
+Platform    : Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39
+Python      : 3.12.3
+networkx    : 3.6.1
+Script      : scripts/run_simulation.py
+Honest nodes: 300  |  Trials/config: 20  |  Rounds/trial: 25
+
+Purpose: replace README/site/paper Evaluation claims (which were not backed by any runnable code prior to this benchmark) with numbers produced by actually driving src/core/scoring/cts_engine.py, src/mitigation/isolation/isolation_guard.py, src/monitoring/behavior/relay_monitor.py, and src/monitoring/graph/peer_graph.py against synthetically generated networks (simulation/network/topology.py, simulation/scenarios/sybil_injection.py, simulation/scenarios/detection_pipeline.py).
+
+[eclipse        ] ratio=0.10 intensity=1.0  TPR=100.0%  FPR= 0.00%  baseline TPR=100.0% baseline FPR=11.00%  latency(med)=0.0
+[eclipse        ] ratio=0.10 intensity=0.5  TPR= 50.8%  FPR= 0.00%  baseline TPR=100.0% baseline FPR=11.00%  latency(med)=0
+[eclipse        ] ratio=0.20 intensity=1.0  TPR=100.0%  FPR= 0.00%  baseline TPR=100.0% baseline FPR= 0.00%  latency(med)=0.0
+[eclipse        ] ratio=0.20 intensity=0.5  TPR= 49.9%  FPR= 0.00%  baseline TPR= 99.9% baseline FPR= 0.03%  latency(med)=0
+[eclipse        ] ratio=0.30 intensity=1.0  TPR=100.0%  FPR= 0.00%  baseline TPR= 65.9% baseline FPR= 0.00%  latency(med)=0.0
+[eclipse        ] ratio=0.30 intensity=0.5  TPR= 49.5%  FPR= 0.00%  baseline TPR= 65.9% baseline FPR= 0.00%  latency(med)=0
+[consensus_mask ] ratio=0.10 intensity=1.0  TPR=100.0%  FPR= 0.00%  baseline TPR=100.0% baseline FPR=11.00%  latency(med)=6.0
+[consensus_mask ] ratio=0.10 intensity=0.5  TPR= 48.9%  FPR= 0.00%  baseline TPR=100.0% baseline FPR=11.00%  latency(med)=6
+[consensus_mask ] ratio=0.20 intensity=1.0  TPR=100.0%  FPR= 0.00%  baseline TPR= 99.9% baseline FPR= 0.03%  latency(med)=6.0
+[consensus_mask ] ratio=0.20 intensity=0.5  TPR= 48.3%  FPR= 0.00%  baseline TPR= 99.9% baseline FPR= 0.03%  latency(med)=6.0
+[consensus_mask ] ratio=0.30 intensity=1.0  TPR=100.0%  FPR= 0.00%  baseline TPR= 65.9% baseline FPR= 0.00%  latency(med)=6.0
+[consensus_mask ] ratio=0.30 intensity=0.5  TPR= 50.3%  FPR= 0.00%  baseline TPR= 65.9% baseline FPR= 0.00%  latency(med)=6
+[mempool_flood  ] ratio=0.10 intensity=1.0  TPR=100.0%  FPR= 0.00%  baseline TPR=100.0% baseline FPR=11.00%  latency(med)=0.0
+[mempool_flood  ] ratio=0.10 intensity=0.5  TPR= 48.2%  FPR= 0.00%  baseline TPR=100.0% baseline FPR=11.00%  latency(med)=0.0
+[mempool_flood  ] ratio=0.20 intensity=1.0  TPR=100.0%  FPR= 0.00%  baseline TPR= 99.9% baseline FPR= 0.02%  latency(med)=0.0
+[mempool_flood  ] ratio=0.20 intensity=0.5  TPR= 49.2%  FPR= 0.00%  baseline TPR= 99.9% baseline FPR= 0.03%  latency(med)=0.0
+[mempool_flood  ] ratio=0.30 intensity=1.0  TPR=100.0%  FPR= 0.00%  baseline TPR= 65.9% baseline FPR= 0.00%  latency(med)=0.0
+[mempool_flood  ] ratio=0.30 intensity=0.5  TPR= 51.2%  FPR= 0.00%  baseline TPR= 65.9% baseline FPR= 0.00%  latency(med)=0.0
+[dfl_poison     ] ratio=0.10 intensity=1.0  TPR=100.0%  FPR= 0.00%  baseline TPR=100.0% baseline FPR=11.00%  latency(med)=1.0
+[dfl_poison     ] ratio=0.10 intensity=0.5  TPR= 47.4%  FPR= 0.00%  baseline TPR=100.0% baseline FPR=11.00%  latency(med)=1
+[dfl_poison     ] ratio=0.20 intensity=1.0  TPR=100.0%  FPR= 0.00%  baseline TPR= 99.9% baseline FPR= 0.03%  latency(med)=1.0
+[dfl_poison     ] ratio=0.20 intensity=0.5  TPR= 49.5%  FPR= 0.00%  baseline TPR= 99.9% baseline FPR= 0.03%  latency(med)=1.0
+[dfl_poison     ] ratio=0.30 intensity=1.0  TPR=100.0%  FPR= 0.00%  baseline TPR= 65.9% baseline FPR= 0.00%  latency(med)=1.0
+[dfl_poison     ] ratio=0.30 intensity=0.5  TPR= 51.2%  FPR= 0.00%  baseline TPR= 65.9% baseline FPR= 0.00%  latency(med)=1.0
+
+Total wall-clock time for all trials: 620.8s
+
+======================================================================
+DETAILED RESULTS (mean over trials; stdev in parentheses)
+======================================================================
+
+-- eclipse --
+ ratio intens              TPR              FPR   base TPR   base FPR   lat(med/mean rounds)
+  0.10    1.0     100.0% (0.0)     0.00% (0.00)     100.0%      11.0%                0.0/0.0
+  0.10    0.5      50.8% (6.2)     0.00% (0.00)     100.0%      11.0%                  0/0.0
+  0.20    1.0     100.0% (0.0)     0.00% (0.00)     100.0%       0.0%                0.0/0.0
+  0.20    0.5      49.9% (8.2)     0.00% (0.00)      99.9%       0.0%                  0/0.0
+  0.30    1.0     100.0% (0.0)     0.00% (0.00)      65.9%       0.0%                0.0/0.0
+  0.30    0.5      49.5% (4.8)     0.00% (0.00)      65.9%       0.0%                  0/0.0
+
+-- consensus_mask --
+ ratio intens              TPR              FPR   base TPR   base FPR   lat(med/mean rounds)
+  0.10    1.0     100.0% (0.0)     0.00% (0.00)     100.0%      11.0%                6.0/6.0
+  0.10    0.5      48.9% (9.5)     0.00% (0.00)     100.0%      11.0%                  6/6.0
+  0.20    1.0     100.0% (0.0)     0.00% (0.00)      99.9%       0.0%                6.0/6.0
+  0.20    0.5      48.3% (5.3)     0.00% (0.00)      99.9%       0.0%                6.0/6.0
+  0.30    1.0     100.0% (0.0)     0.00% (0.00)      65.9%       0.0%                6.0/6.0
+  0.30    0.5      50.3% (4.6)     0.00% (0.00)      65.9%       0.0%                  6/6.0
+
+-- mempool_flood --
+ ratio intens              TPR              FPR   base TPR   base FPR   lat(med/mean rounds)
+  0.10    1.0     100.0% (0.0)     0.00% (0.00)     100.0%      11.0%                0.0/0.0
+  0.10    0.5      48.2% (6.0)     0.00% (0.00)     100.0%      11.0%                0.0/0.0
+  0.20    1.0     100.0% (0.0)     0.00% (0.00)      99.9%       0.0%                0.0/0.0
+  0.20    0.5      49.2% (6.5)     0.00% (0.00)      99.9%       0.0%                0.0/0.0
+  0.30    1.0     100.0% (0.0)     0.00% (0.00)      65.9%       0.0%                0.0/0.0
+  0.30    0.5      51.2% (5.5)     0.00% (0.00)      65.9%       0.0%                0.0/0.0
+
+-- dfl_poison --
+ ratio intens              TPR              FPR   base TPR   base FPR   lat(med/mean rounds)
+  0.10    1.0     100.0% (0.0)     0.00% (0.00)     100.0%      11.0%                1.0/1.0
+  0.10    0.5      47.4% (7.4)     0.00% (0.00)     100.0%      11.0%                  1/1.0
+  0.20    1.0     100.0% (0.0)     0.00% (0.00)      99.9%       0.0%                1.0/1.0
+  0.20    0.5      49.5% (5.5)     0.00% (0.00)      99.9%       0.0%                1.0/1.0
+  0.30    1.0     100.0% (0.0)     0.00% (0.00)      65.9%       0.0%                1.0/1.0
+  0.30    0.5      51.2% (4.6)     0.00% (0.00)      65.9%       0.0%                1.0/1.0
+
+======================================================================
+ISOLATION GUARD (eclipse scenario, real accept_connection() calls)
+======================================================================
+Sybil attack-edge connection attempts rejected by IsolationGuard: 110/400 (27.5%)
+
+======================================================================
+COMPUTATIONAL OVERHEAD (wall-clock, this machine -- NOT a network
+consensus latency benchmark; no consensus loop exists in this repo)
+======================================================================
+IsolationGuard.accept_connection() mean: 76.14 microseconds/call
+No-op baseline (unconditional accept) mean: 0.068 microseconds/call
+Delta: +76.07 microseconds/call attributable to the subnet-diversity + per-subnet-limit evaluation in IsolationGuard.
+
+======================================================================
+METHODOLOGY
+======================================================================
+
+Network generation (simulation/network/topology.py):
+  Honest topology: Barabasi-Albert preferential attachment, n = 300 honest
+  nodes, m = 4 edges per new node (networkx.barabasi_albert_graph). Honest
+  peers are assigned IPs from a pool of 120 distinct /16 subnets.
+
+Sybil injection (simulation/scenarios/sybil_injection.py):
+  Sybil count derived so Sybils form the requested fraction of the TOTAL
+  post-injection network (e.g. ratio=0.30 means Sybils are 30% of all
+  nodes, not 30% of the honest count). Sybil identities are drawn from
+  only 4 shared /16 subnets (cheap shared hosting -- the realistic
+  economic signature of a Sybil farm), densely interconnected internally
+  (mean internal degree ~6, Erdos-Renyi), and attach to the honest region
+  through a small number of "attack edges" (~4 per 100 Sybils), following
+  the attack-edge assumption used in the SybilGuard/SybilLimit line of
+  work (Yu et al. 2008; this harness does not reimplement their random
+  walk protocol -- see baseline note below).
+
+Detection pipeline (simulation/scenarios/detection_pipeline.py):
+  Wires the actual CTSEngine, BehaviorMonitor, PeerGraph, and
+  IsolationGuard classes together (no detection logic reimplemented).
+  Each trial runs 25 behavioral rounds. Per round, honest peers
+  emit a relay event via BehaviorMonitor.record_relay() with a delay drawn
+  from a jitter model (4% chance of exceeding the real 30s
+  RELAY_TIMEOUT_SECONDS constant, else Normal(6s, 3s)). Active Sybils emit
+  attack-specific events through the real monitor/engine methods:
+    - eclipse:         BehaviorMonitor.record_eclipse_attempt() once
+    - consensus_mask:  BehaviorMonitor.record_relay() with delay > timeout, every round
+    - mempool_flood:   BehaviorMonitor.record_transaction_broadcast() bursts of 60/round
+    - dfl_poison:      CTSEngine.update_behavior(..., "oracle_deviation") every round
+  A configurable fraction of Sybils ("intensity") are "dormant" -- ground-truth
+  Sybil but behaviorally indistinguishable from honest peers for the whole
+  trial, modeling a mixed active/sleeper adversary population.
+
+  After the behavioral rounds, ONE graph-topology snapshot is taken (as
+  configs/monitoring.yaml's snapshot_interval_blocks implies periodic,
+  not continuous, graph recomputation) using the real PeerGraph methods:
+  local_clustering_coefficient(), sybilrank_scores() (seeded from the 6
+  honest peers with highest in+out degree), and subnet_diversity_score().
+  These are combined into a graph_score and applied via the real
+  CTSEngine.update_centrality() API.
+
+  A modest economic signal is applied via the existing (and otherwise
+  unused in the reference code) REWARD_WEIGHTS["stake_age_bonus"] event,
+  scaled to log2(stake_age_blocks).
+
+  A peer is classified Sybil-predicted if CTSEngine's own PeerRecord.quarantined
+  flag is True at the end of the trial (score crossed the real 0.20
+  QUARANTINE threshold in cts_engine.py at any point -- this flag is a
+  ONE-WAY latch in the current reference implementation; see limitations).
+
+Baseline (graph-only) comparison:
+  A simplified graph-propagation-only detector: flag the bottom 20th
+  percentile of nodes (by network) ranked by normalized SybilRank trust
+  mass computed via the SAME PeerGraph.sybilrank_scores() call used by the
+  composite detector. This is NOT a reimplementation of the SybilGuard or
+  SybilLimit random-walk protocols -- it exists to show what a
+  graph-signal-only detector achieves on the identical generated topology,
+  for honest contextual comparison, not a faithful reproduction of either
+  paper's exact algorithm.
+
+======================================================================
+SCOPE AND HONEST LIMITATIONS
+======================================================================
+
+  - Scale: hundreds of nodes (not the 2,000-node / 10,000-block scale
+    originally asserted on the site/README before this benchmark).
+    "Rounds" are abstract behavioral ticks, not real Bitcoin block
+    intervals; no block propagation, consensus, mempool, or peer churn is
+    actually simulated.
+  - CTSEngine.PeerRecord.quarantined never resets to False once set, even
+    if the score later recovers above the 0.35 reinstatement threshold
+    referenced in configs/monitoring.yaml. The paper's discussion section
+    describes mitigation as "reversible by design"; the reference
+    scoring engine as it exists in this repository does not currently
+    implement that reversal. This benchmark reports quarantine status as
+    measured, not as this harness's assumption.
+  - PeerRecord.stake_age_blocks is stored but never read by CTSEngine's
+    own scoring path; this harness's economic signal is applied only
+    through the existing stake_age_bonus reward event, not through a
+    stake_age-aware formula that doesn't exist in the reference code.
+  - "Computational overhead" measures IsolationGuard.accept_connection()
+    wall-clock cost on this machine, not real network consensus latency
+    -- there is no consensus loop, network I/O, or multi-node simulation
+    in this repository to measure that against.
+  - Attack behavior is scripted per-scenario (one attack_type per trial),
+    not adaptive/multi-vector; a real adversary mixing attack types or
+    adapting to observed quarantine events is out of scope here.
+  - The intensity=1.0 (fully active adversary) condition produces very
+    clean separation (TPR at or near 100%, FPR near 0%) because the
+    scripted attack behaviors trip PENALTY_WEIGHTS entries that are
+    already calibrated aggressively in the existing cts_engine.py
+    (e.g. eclipse_attempt = 0.40, more than double the quarantine
+    threshold in a single event) -- this is a direct, measured
+    consequence of weights already present in the reference
+    implementation, not tuning performed for this benchmark. The
+    intensity=0.5 condition (roughly half of Sybils dormant) is reported
+    alongside it specifically so the results are not read as "detection
+    is always ~100%" -- dormant Sybils that never behave maliciously and
+    hold no distinguishing graph position are, correctly, often not
+    detected by a behavioral+graph signal.
+  - No adversarial evasion against the CTS/graph scoring itself (e.g. an
+    attacker deliberately diversifying Sybil subnets or timing behavior
+    to mimic the honest jitter distribution) is modeled.
+  - Dormant Sybils (intensity<1.0, non-attacking share) are detected at a
+    rate close to (1 - dormant_fraction), i.e. close to 0% additional
+    detection from the graph signal alone. CTSEngine.update_centrality()
+    contributes at most +/-0.10 to a peer's score (a fixed 10% weight
+    hardcoded in cts_engine.py), which cannot by itself move a
+    dormant Sybil's score from the neutral starting point (0.5) down to
+    the 0.20 quarantine threshold (a 0.30 gap). In this harness, dormant
+    Sybils are essentially caught only if they also happen to receive a
+    behavioral penalty; a purely graph-based dormant-Sybil signal is not,
+    on this evidence, strong enough on its own to trigger quarantine.
+  - The graph-only BASELINE's TPR/FPR are mechanically constrained by the
+    fixed 20th-percentile flagging quota chosen for it, interacting with
+    each trial's actual Sybil prevalence: at ratio=0.10 (Sybils are 10%
+    of the network but the quota flags 20%), the baseline's FPR of ~11%
+    is arithmetically close to (20%-10%)/90% -- it must flag honest
+    nodes to fill its quota. At ratio=0.30 (Sybils exceed the 20% quota),
+    baseline TPR caps near 20/30 = 66.7% because the quota cannot flag
+    more than 20% of all nodes regardless of how many are actually
+    Sybil. These are properties of the fixed-percentile baseline
+    methodology, not a claim that graph-only detection "gets harder" at
+    higher density in some deeper sense -- a percentile recalibrated per
+    density would score differently. This is disclosed rather than
+    tuned away because a real defender does not know the true Sybil
+    density in advance either.
+
+======================================================================
+REPRODUCTION
+======================================================================
+  python scripts/run_simulation.py --nodes 300 --trials 20 --sybil-ratios 0.10,0.20,0.30 --scenario all --intensities 1.0,0.5
+  Requires: networkx (see requirements.txt). No GPU, no external services.
