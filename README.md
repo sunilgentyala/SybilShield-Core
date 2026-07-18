@@ -2,7 +2,7 @@
 
 **A modular, multi-layer anti-Sybil framework for permissionless peer-to-peer blockchain networks.**
 
-[![Paper](https://img.shields.io/badge/IEEE-ICICDS%202026-blue)](https://icicds.com/2026/) [![Site](https://img.shields.io/badge/site-github.io-4fd1c5)](https://sunilgentyala.github.io/SybilShield-Core/)
+[![Paper](https://img.shields.io/badge/IEEE_Xplore-Published-blue)](https://ieeexplore.ieee.org/document/11604799) [![Site](https://img.shields.io/badge/site-github.io-4fd1c5)](https://sunilgentyala.github.io/SybilShield-Core/)
 
 SybilShield-Core implements a Composite Trust Scoring (CTS) engine that fuses behavioral telemetry, social-graph topology analysis, and economic commitment signals to detect and isolate Sybil entities without relying on Proof-of-Work expenditure or centralized identity authorities.
 
@@ -152,7 +152,7 @@ Sunil Gentyala (IEEE Senior Member, HCLTECH America Inc., Dallas TX) |
 K Sanjeevaiah (Malla Reddy Engineering College for Women, Hyderabad, India) |
 Suresh Kumar Darisi (Rocket Software Inc., Dallas TX)
 
-**Accepted at [IEEE ICICDS 2026](https://icicds.com/2026/)** (Paper ID ICICDS-690). The manuscript is not publicly available prior to publication to comply with IEEE copyright policy. A DOI and citation will be added here once the proceedings are indexed by IEEE Xplore.
+**Published in [IEEE Xplore](https://ieeexplore.ieee.org/document/11604799)** — IEEE ICICDS 2026 (Paper ID ICICDS-690). The manuscript is not publicly redistributable per IEEE copyright policy; see the IEEE Xplore record for the official abstract and citation.
 
 
 
