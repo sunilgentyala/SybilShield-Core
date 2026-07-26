@@ -12,3 +12,6 @@ build/
 .pytest_cache/
 artifacts/logs/*.log
 *.pcap
+
+# Duplicate generator embedding full paper text -- superseded by paper/build_docx.py
+scripts/generate_ieee_docx.py
