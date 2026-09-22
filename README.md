@@ -4,6 +4,8 @@
 
 [![Paper](https://img.shields.io/badge/IEEE_Xplore-Published-blue)](https://ieeexplore.ieee.org/document/11604799) [![Site](https://img.shields.io/badge/site-github.io-4fd1c5)](https://sunilgentyala.github.io/SybilShield-Core/)
 
+> *Published in IEEE Xplore: [ieeexplore.ieee.org/document/11604799](https://ieeexplore.ieee.org/document/11604799) | DOI: [10.1109/ICICDS70526.2026.11604799](https://ieeexplore.ieee.org/document/11604799)*
+
 SybilShield-Core implements a Composite Trust Scoring (CTS) engine that fuses behavioral telemetry, social-graph topology analysis, and economic commitment signals to detect and isolate Sybil entities without relying on Proof-of-Work expenditure or centralized identity authorities.
 
 Project site: **[sunilgentyala.github.io/SybilShield-Core](https://sunilgentyala.github.io/SybilShield-Core/)**
@@ -152,7 +154,7 @@ Sunil Gentyala (IEEE Senior Member, HCLTECH America Inc., Dallas TX) |
 K Sanjeevaiah (Malla Reddy Engineering College for Women, Hyderabad, India) |
 Suresh Kumar Darisi (Rocket Software Inc., Dallas TX)
 
-**Published in [IEEE Xplore](https://ieeexplore.ieee.org/document/11604799)** — IEEE ICICDS 2026 (Paper ID ICICDS-690). The manuscript is not publicly redistributable per IEEE copyright policy; see the IEEE Xplore record for the official abstract and citation.
+**Published in [IEEE Xplore](https://ieeexplore.ieee.org/document/11604799)** — IEEE ICICDS 2026 (Paper ID ICICDS-690), DOI: [10.1109/ICICDS70526.2026.11604799](https://ieeexplore.ieee.org/document/11604799). The manuscript is not publicly redistributable per IEEE copyright policy; see the IEEE Xplore record for the official abstract and citation.
 
 
 
