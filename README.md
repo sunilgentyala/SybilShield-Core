@@ -160,6 +160,31 @@ Suresh Kumar Darisi (Rocket Software Inc., Dallas TX)
 
 ---
 
+## How to Cite
+
+If you use SybilShield-Core in your research, please cite the paper:
+
+```bibtex
+@inproceedings{gentyala2026sybilshield,
+  author    = {Gentyala, Sunil and Sanjeevaiah, K and Darisi, Suresh Kumar},
+  title     = {{SybilShield-Core}: A Composite Trust Scoring Framework for Sybil
+               Attack Mitigation in Permissionless Blockchain Networks},
+  booktitle = {2026 Third International Conference on Innovations in
+               Cybersecurity and Data Science (ICICDS)},
+  pages     = {349--355},
+  year      = {2026},
+  publisher = {IEEE},
+  doi       = {10.1109/ICICDS70526.2026.11604799},
+  url       = {https://doi.org/10.1109/ICICDS70526.2026.11604799}
+}
+```
+
+**IEEE format:** S. Gentyala, K. Sanjeevaiah, and S. K. Darisi, "SybilShield-Core: A Composite Trust Scoring Framework for Sybil Attack Mitigation in Permissionless Blockchain Networks," in *Proc. 2026 3rd Int. Conf. Innovations in Cybersecurity and Data Science (ICICDS)*, 2026, pp. 349-355, doi: 10.1109/ICICDS70526.2026.11604799.
+
+Machine-readable metadata is in [`CITATION.cff`](CITATION.cff); GitHub shows it under "Cite this repository".
+
+---
+
 ## License
 
 MIT

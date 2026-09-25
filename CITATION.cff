@@ -1,0 +1,49 @@
+cff-version: 1.2.0
+message: If you use this software in your research, please cite it as below.
+type: software
+title: SybilShield-Core
+authors:
+- family-names: Gentyala
+  given-names: Sunil
+  affiliation: HCLTech (HCL America Inc.), Dallas, TX, USA
+  orcid: https://orcid.org/0009-0005-2642-3479
+  email: sunil.gentyala@ieee.org
+- family-names: Sanjeevaiah
+  given-names: K
+- family-names: Darisi
+  given-names: Suresh Kumar
+repository-code: https://github.com/sunilgentyala/SybilShield-Core
+url: https://sunilgentyala.github.io/SybilShield-Core/
+license: MIT
+abstract: A modular composite trust scoring framework for Sybil-resilient permissionless blockchain
+  networks. Reference implementation and simulation for the IEEE ICICDS 2026 paper.
+keywords:
+- sybil-attack
+- blockchain
+- trust-scoring
+- peer-to-peer
+- network-security
+preferred-citation:
+  type: conference-paper
+  title: 'SybilShield-Core: A Composite Trust Scoring Framework for Sybil Attack Mitigation
+    in Permissionless Blockchain Networks'
+  authors:
+  - family-names: Gentyala
+    given-names: Sunil
+    affiliation: HCLTech (HCL America Inc.), Dallas, TX, USA
+    orcid: https://orcid.org/0009-0005-2642-3479
+    email: sunil.gentyala@ieee.org
+  - family-names: Sanjeevaiah
+    given-names: K
+  - family-names: Darisi
+    given-names: Suresh Kumar
+  collection-title: 2026 Third International Conference on Innovations in Cybersecurity and
+    Data Science (ICICDS)
+  collection-type: proceedings
+  publisher:
+    name: IEEE
+  year: 2026
+  start: 349
+  end: 355
+  doi: 10.1109/ICICDS70526.2026.11604799
+  url: https://doi.org/10.1109/ICICDS70526.2026.11604799
